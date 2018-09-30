@@ -2,6 +2,7 @@ from __future__ import print_function
 import httplib2
 import os
 
+import datetime
 from apiclient import discovery
 from oauth2client import client
 from oauth2client import tools
@@ -39,24 +40,55 @@ def get_credentials():
     return credentials
 
 def main():
+    path = 'data/src/'
+    fr=open((path+'report.txt'),mode='r+')
+    ft=open((path+'test.txt'),mode='r+')
+    fg=open((path+'goods.txt'),mode='r+')
+    fe=open((path+'allevent.txt'),mode='r+')
+
+
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     service=discovery.build('calendar','v3',http=http)
 
     now = datetime.datetime.utcnow().isoformat() + 'Z'
-    print('Getting the upcoming 10 events')
+    print('Getting the upcoming 20 events')
     eventsResult = service.events().list(
-        calendarId='primary',timeMin=now,maxResults=10,singleEvents=True,
+        calendarId='primary',timeMin=now,maxResults=20,singleEvents=True,
         orderBy='startTime').execute()
     events = eventsResult.get('items',[])
 
     if not events:
         print('No upcoming events found.')
     for event in events:
-        start = event['start'].get('datatime',event['start'].get('data'))
-        print(start,event['summary'])
-        print(event['start'])
+        start = event['start'].get('dateTime',event['start'].get('date'))
+        str = event['summary']
+        if(str[0:2]=='SS'):
+            print(start,str[6:])
+            fr.writeines(start,str)
+
+    fr.close()
+    ft.close()
+    fg.close()
+    fe.close()
+
+def string2datetime(str_time):
+    int_year = int(str_time[0:4])
+    int_month= int(str_time[5:7])
+    int_day  = int(str_time[8:10])
+    int_hour = int(str_time[11:13])
+    int_min  = int(str_time[14:16])
+    int_sec  = int(str_time[17:19])
+    dt_time  = datetime.datetime(int_year,int_month,int_day,int_hour,int_min,int_sec,int_sec)
+
+def deleteOldEvent():
+    return
+
+def addNewEvent():
+    return
+
+def updateEvent():
+    return
 
 if __name__ =='__main__':
-
-main()
+    main()
