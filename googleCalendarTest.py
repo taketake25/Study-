@@ -40,37 +40,21 @@ def get_credentials():
     return credentials
 
 def main():
-    path = 'data/src/'
-    fr=open((path+'report.txt'),mode='r+')
-    ft=open((path+'test.txt'),mode='r+')
-    fg=open((path+'goods.txt'),mode='r+')
-    fe=open((path+'allevent.txt'),mode='r+')
-
-
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     service=discovery.build('calendar','v3',http=http)
 
     now = datetime.datetime.utcnow().isoformat() + 'Z'
-    print('Getting the upcoming 20 events')
+    print('Getting the upcoming 40 events')
     eventsResult = service.events().list(
-        calendarId='primary',timeMin=now,maxResults=20,singleEvents=True,
+        calendarId='primary',timeMin=now,maxResults=40,singleEvents=True,
         orderBy='startTime').execute()
     events = eventsResult.get('items',[])
 
     if not events:
         print('No upcoming events found.')
-    for event in events:
-        start = event['start'].get('dateTime',event['start'].get('date'))
-        str = event['summary']
-        if(str[0:2]=='SS'):
-            print(start,str[6:])
-            fr.writeines(start,str)
 
-    fr.close()
-    ft.close()
-    fg.close()
-    fe.close()
+    addNewEvent(events)
 
 def string2datetime(str_time):
     int_year = int(str_time[0:4])
@@ -80,15 +64,97 @@ def string2datetime(str_time):
     int_min  = int(str_time[14:16])
     int_sec  = int(str_time[17:19])
     dt_time  = datetime.datetime(int_year,int_month,int_day,int_hour,int_min,int_sec,int_sec)
+    return dt_time
 
 def deleteOldEvent():
     return
 
-def addNewEvent():
-    return
+def addNewEvent(events):
+    path = 'data/src/'
+    with open((path+"report.txt")) as fr:
+        lr=fr.readlines()
+    with open((path+"test.txt")) as ft:
+        lt=ft.readlines()
+    with open((path+"goods.txt")) as fg:
+        lg=fg.readlines()
+    with open((path+"event.txt")) as fe:
+        le=fe.readlines()
+    with open((path+"allevent.txt")) as fa:
+        la=fa.readlines()
+
+    fr=open((path+'report.txt'),mode='w')
+    ft=open((path+'test.txt'),mode='w')
+    fg=open((path+'goods.txt'),mode='w')
+    fe=open((path+'event.txt'),mode='w')
+    fa=open((path+'allevent.txt'),mode='w')
+
+    for event in events:
+        start = event['start'].get('dateTime',event['start'].get('date'))
+        eventName = event['summary'].encode('utf-8')
+        dates = string2datetime(start)
+        eventTime = "{:0<4}{:0<2}{:0<2}{:0<2}".format(dates.year,dates.month,dates.day,dates.hour)
+
+        if(eventName[0:2]=='SS'):
+            flag = True
+            for word in la:
+                if(eventTime==word[0:10] and eventName[6:]==word[10:-1]):
+                    flag = False
+                    break
+            if(not flag):
+                continue
+
+            la.insert(0,eventTime+eventName[6:]+'\n') #write all events
+            if(eventName[2]=='R'):
+                print(start, "report" , eventName[6:])
+                lr.insert(0,eventName[6:]+'\n')
+            if(eventName[3]=='T'):
+                print(start, "test  " , eventName[6:])
+                lt.insert(0,eventName[6:]+'\n')
+            if(eventName[4]=='G'):
+                print(start, "goods " , eventName[6:])
+                lg.insert(0,eventName[6:]+'\n')
+            if(eventName[5]=='E'):
+                print(start, "event " , eventName[6:])
+                le.insert(0,eventName[6:]+'\n')
+
+    fr.writelines(lr)
+    ft.writelines(lt)
+    fg.writelines(lg)
+    fe.writelines(le)
+    fa.writelines(la)
+    fr.close()
+    ft.close()
+    fg.close()
+    fe.close()
+    fa.close()
 
 def updateEvent():
     return
 
 if __name__ =='__main__':
+    #make files
+    path = 'data/src/'
+    try:
+        with open((path+'report.txt'),mode='r'):
+            pass
+        with open((path+'test.txt'),mode='r'):
+            pass
+        with open((path+'goods.txt'),mode='r'):
+            pass
+        with open((path+'event.txt'),mode='r'):
+            pass
+        with open((path+'allevent.txt'),mode='r'):
+            pass
+    except IOError as e:
+        with open((path+'report.txt'),mode='w'):
+            pass
+        with open((path+'test.txt'),mode='w'):
+            pass
+        with open((path+'goods.txt'),mode='w'):
+            pass
+        with open((path+'event.txt'),mode='w'):
+            pass
+        with open((path+'allevent.txt'),mode='w'):
+            pass
+
     main()
