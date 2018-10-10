@@ -1,8 +1,10 @@
+# coding: utf-8
 from __future__ import print_function
 import httplib2
 import os
+from pykakasi import kakasi
+import mojimoji
 
-import datetime
 from apiclient import discovery
 from oauth2client import client
 from oauth2client import tools
@@ -103,18 +105,33 @@ def addNewEvent(events):
             if(not flag):
                 continue
 
+
+            kks = kakasi()
+
+            # kks.setMode('H','K')
+            # kks.setMode('K','K')
+            kks.setMode("J","K")
+
+            conv = kks.getConverter()
+            onlyKana = conv.do(eventName[6:].decode('utf-8'))
+            onlyKana = mojimoji.zen_to_han(onlyKana)
+
             la.insert(0,eventTime+eventName[6:]+'\n') #write all events
             if(eventName[2]=='R'):
-                print(start, "report" , eventName[6:])
+                # print(start, "report" , eventName[6:])
+                print(start, "report" ,onlyKana)
                 lr.insert(0,eventName[6:]+'\n')
             if(eventName[3]=='T'):
-                print(start, "test  " , eventName[6:])
+                # print(start, "test  " , eventName[6:])
+                print(start, "test  " ,onlyKana)
                 lt.insert(0,eventName[6:]+'\n')
             if(eventName[4]=='G'):
-                print(start, "goods " , eventName[6:])
+                # print(start, "goods " , eventName[6:])
+                print(start, "goods " ,onlyKana)
                 lg.insert(0,eventName[6:]+'\n')
             if(eventName[5]=='E'):
-                print(start, "event " , eventName[6:])
+                # print(start, "event " , eventName[6:])
+                print(start, "event " ,onlyKana)
                 le.insert(0,eventName[6:]+'\n')
 
     fr.writelines(lr)
