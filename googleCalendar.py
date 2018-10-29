@@ -18,9 +18,11 @@ try:
 except ImportError:
     flags = None
 
+
 SCOPES ='https://www.googleapis.com/auth/calendar.readonly'
 CLIENT_SCOPE_FILE = 'client_secret.json'
 APPLICATION_NAME = 'Study# google API test'
+
 
 def get_credentials():
     home_dir = os.path.expanduser('~')
@@ -41,10 +43,13 @@ def get_credentials():
         print('Storing credentials to '+credential_path)
     return credentials
 
-def main():
+def googleAPImain(path):
+
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     service=discovery.build('calendar','v3',http=http)
+
+    initFiles(path)
 
     now = datetime.datetime.utcnow().isoformat() + 'Z'
     print('Getting the upcoming 40 events')
@@ -56,7 +61,7 @@ def main():
     if not events:
         print('No upcoming events found.')
 
-    addNewEvent(events)
+    addNewEvent(path,events)
 
 def string2datetime(str_time):
     int_year = int(str_time[0:4])
@@ -68,10 +73,35 @@ def string2datetime(str_time):
     dt_time  = datetime.datetime(int_year,int_month,int_day,int_hour,int_min,int_sec,int_sec)
     return dt_time
 
+def initFiles(path):
+    try:
+        with open((path+'report.txt'),mode='r'):
+            pass
+        with open((path+'test.txt'),mode='r'):
+            pass
+        with open((path+'goods.txt'),mode='r'):
+            pass
+        with open((path+'event.txt'),mode='r'):
+            pass
+        with open((path+'allevent.txt'),mode='r'):
+            pass
+    except IOError as e:
+        with open((path+'report.txt'),mode='w'):
+            pass
+        with open((path+'test.txt'),mode='w'):
+            pass
+        with open((path+'goods.txt'),mode='w'):
+            pass
+        with open((path+'event.txt'),mode='w'):
+            pass
+        with open((path+'allevent.txt'),mode='w'):
+            pass
+    return
+
 def deleteOldEvent():
     return
 
-def addNewEvent(events):
+def addNewEvent(path,events):
     path = 'data/src/'
     with open((path+"report.txt")) as fr:
         lr=fr.readlines()
@@ -104,7 +134,6 @@ def addNewEvent(events):
                     break
             if(not flag):
                 continue
-
 
             kks = kakasi()
 
@@ -151,27 +180,5 @@ def updateEvent():
 if __name__ =='__main__':
     #make files
     path = 'data/src/'
-    try:
-        with open((path+'report.txt'),mode='r'):
-            pass
-        with open((path+'test.txt'),mode='r'):
-            pass
-        with open((path+'goods.txt'),mode='r'):
-            pass
-        with open((path+'event.txt'),mode='r'):
-            pass
-        with open((path+'allevent.txt'),mode='r'):
-            pass
-    except IOError as e:
-        with open((path+'report.txt'),mode='w'):
-            pass
-        with open((path+'test.txt'),mode='w'):
-            pass
-        with open((path+'goods.txt'),mode='w'):
-            pass
-        with open((path+'event.txt'),mode='w'):
-            pass
-        with open((path+'allevent.txt'),mode='w'):
-            pass
 
-    main()
+    googleAPImain(path)
