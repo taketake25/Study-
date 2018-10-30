@@ -28,7 +28,7 @@ class espServer:
         self.device = self.adapter.connect(self.address)
 
     def scan(self,timeout=3):
-
+        return
         # for device in .self.devices:
         #     address = device['address']
         #
@@ -78,5 +78,5 @@ class espServer:
 if __name__ == '__main__':
     server = espServer('30:AE:A4:07:B6:26',"00000c19-0000-1000-8000-00805f9b34fb")
     # server.scan()
-    server.write("sumika!")
+    server.write("takepi!")
     reading = server.read()
