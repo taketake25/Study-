@@ -16,6 +16,7 @@ class espServer:
     write_characteristic= "00000c19-0000-1000-8000-00805f9b34fb"
     notify_characteristic = "00000c19-0000-1000-8000-00805f9b34fb"
 
+
     def __init__(self,addr,uuid):
         self.address = addr
         self.read_characteristic = uuid
@@ -26,6 +27,7 @@ class espServer:
 
         self.adapter.start()
         self.device = self.adapter.connect(self.address)
+
 
     def scan(self,timeout=3):
         return
@@ -73,7 +75,9 @@ class espServer:
             print(chr(word), end='')
         print("\"")
 
+        time.sleep(0.1)
         return getstr
+
 
 if __name__ == '__main__':
     server = espServer('30:AE:A4:07:B6:26',"00000c19-0000-1000-8000-00805f9b34fb")

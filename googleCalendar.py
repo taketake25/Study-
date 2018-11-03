@@ -52,12 +52,12 @@ class googleCalendar:
             print('Storing credentials to '+credential_path)
         return credentials
 
-    def googleAPImain(self):
+    def loadAllSchedules(self):
         path = self.filePath
 
         now = datetime.datetime.utcnow().isoformat() + 'Z'
 
-        print('Getting the upcoming 40 events')
+        print('Loading the upcoming 40 events')
         eventsResult = self.service.events().list(
             calendarId='primary',timeMin=now,maxResults=40,singleEvents=True,
             orderBy='startTime').execute()
@@ -91,6 +91,8 @@ class googleCalendar:
                 pass
             with open((path+'allevent.txt'),mode='r'):
                 pass
+            with open((path+'kanaevent.txt'),mode='r'):
+                pass
         except IOError as e:
             with open((path+'report.txt'),mode='w'):
                 pass
@@ -101,6 +103,8 @@ class googleCalendar:
             with open((path+'event.txt'),mode='w'):
                 pass
             with open((path+'allevent.txt'),mode='w'):
+                pass
+            with open((path+'kanaevent.txt'),mode='w'):
                 pass
         return
 
@@ -119,73 +123,121 @@ class googleCalendar:
             le=fe.readlines()
         with open((path+"allevent.txt")) as fa:
             la=fa.readlines()
+        with open((path+"kanaevent.txt")) as fk:
+            lk=fk.readlines()
 
         fr=open((path+'report.txt'),mode='w')
         ft=open((path+'test.txt'),mode='w')
         fg=open((path+'goods.txt'),mode='w')
         fe=open((path+'event.txt'),mode='w')
         fa=open((path+'allevent.txt'),mode='w')
+        fk=open((path+'kanaevent.txt'),mode='w')
 
         for event in events:
             start = event['start'].get('dateTime',event['start'].get('date'))
             eventName = event['summary'].encode('utf-8')
             dates = self.string2datetime(start)
-            eventTime = "{:0<4}{:0<2}{:0<2}{:0<2}".format(dates.year,dates.month,dates.day,dates.hour)
+            eventTime = "{:04d}{:02d}{:02d}{:02d}".format(dates.year,dates.month,dates.day,dates.hour)
 
             if(eventName[0:2]=='SS'):
                 flag = True
                 for word in la:
-                    if(eventTime==word[0:10] and eventName[6:]==word[10:-1]):
+                    # if(eventTime==word[0:10] and eventName[6:]==word[16:-1]):
+                    if(eventName[6:]==word[16:-1]):
                         flag = False
                         break
                 if(not flag):
                     continue
 
                 kks = kakasi()
-
-                # kks.setMode('H','K')
+                kks.setMode('H','K')
                 # kks.setMode('K','K')
                 kks.setMode("J","K")
-
                 conv = kks.getConverter()
                 onlyKana = conv.do(eventName[6:].decode('utf-8'))
                 onlyKana = mojimoji.zen_to_han(onlyKana)
 
-                la.insert(0,eventTime+eventName[6:]+'\n') #write all events
+                onlyKana = onlyKana.encode('utf-8')
+
+                la.insert(0,eventTime+","+eventName[2:6]+","+eventName[6:]+'\n') #write all events
+                lk.insert(0,eventTime+","+eventName[2:6]+","+onlyKana+'\n') #write all events in Kana
                 if(eventName[2]=='R'):
-                    # print(start, "report" , eventName[6:])
                     print(start, "report" ,onlyKana)
-                    lr.insert(0,eventName[6:]+'\n')
+                    # lr.insert(0,eventTime+","+eventName[6:]+'\n')
+                    lr.insert(0,eventTime+","+onlyKana+'\n')
                 if(eventName[3]=='T'):
-                    # print(start, "test  " , eventName[6:])
                     print(start, "test  " ,onlyKana)
-                    lt.insert(0,eventName[6:]+'\n')
+                    # lt.insert(0,eventTime+","+eventName[6:]+'\n')
+                    lt.insert(0,eventTime+","+onlyKana+'\n')
                 if(eventName[4]=='G'):
-                    # print(start, "goods " , eventName[6:])
                     print(start, "goods " ,onlyKana)
-                    lg.insert(0,eventName[6:]+'\n')
+                    # lg.insert(0,eventTime+","+eventName[6:]+'\n')
+                    lg.insert(0,eventTime+","+onlyKana+'\n')
                 if(eventName[5]=='E'):
-                    # print(start, "event " , eventName[6:])
                     print(start, "event " ,onlyKana)
-                    le.insert(0,eventName[6:]+'\n')
+                    # le.insert(0,eventTime+","+eventName[6:]+'\n')
+                    le.insert(0,eventTime+","+onlyKana+'\n')
 
         fr.writelines(lr)
         ft.writelines(lt)
         fg.writelines(lg)
         fe.writelines(le)
         fa.writelines(la)
+        fk.writelines(lk)
         fr.close()
         ft.close()
         fg.close()
         fe.close()
         fa.close()
+        fk.close()
 
     def updateEvent(self):
         return
+
+    def getEvent(self,kind):
+        path = self.filePath
+        if(kind=='r'):
+            with open((path+"report.txt")) as f:
+                l=f.readlines()
+        elif(kind=='t'):
+            with open((path+"test.txt")) as f:
+                l=f.readlines()
+        elif(kind=='g'):
+            with open((path+"goods.txt")) as f:
+                l=f.readlines()
+        elif(kind=='e'):
+            with open((path+"event.txt")) as f:
+                l=f.readlines()
+
+        else:
+            l=0
+
+        return l
+
 
 if __name__ =='__main__':
     #make files
     path = 'data/src/'
 
     calendar = googleCalendar(path)
-    calendar.googleAPImain()
+    calendar.loadAllSchedules()
+
+    print("report")
+    schedules = calendar.getEvent('r')
+    for word in schedules:
+        print(word[:-1])
+
+    print("test")
+    schedules = calendar.getEvent('t')
+    for word in schedules:
+        print(bytearray(word[:-1]))
+
+    print("goods")
+    schedules = calendar.getEvent('g')
+    for word in schedules:
+        print(word[:-1])
+
+    print("event")
+    schedules = calendar.getEvent('e')
+    for word in schedules:
+        print(word[:-1])
