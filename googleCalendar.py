@@ -124,7 +124,8 @@ class googleCalendar:
         with open((path+"allevent.txt")) as fa:
             la=fa.readlines()
         with open((path+"kanaevent.txt")) as fk:
-            lk=fk.readlines()
+            # lk=fk.readlines()
+            lk=[]
 
         fr=open((path+'report.txt'),mode='w')
         ft=open((path+'test.txt'),mode='w')
@@ -142,8 +143,8 @@ class googleCalendar:
             if(eventName[0:2]=='SS'):
                 flag = True
                 for word in la:
-                    # if(eventTime==word[0:10] and eventName[6:]==word[16:-1]):
-                    if(eventName[6:]==word[16:-1]):
+                    if(eventTime==word[0:10] and eventName[6:]==word[16:-1]):
+                    # if(eventName[6:]==word[16:-1]):
                         flag = False
                         break
                 if(not flag):
@@ -160,22 +161,26 @@ class googleCalendar:
                 onlyKana = onlyKana.encode('utf-8')
 
                 la.insert(0,eventTime+","+eventName[2:6]+","+eventName[6:]+'\n') #write all events
-                lk.insert(0,eventTime+","+eventName[2:6]+","+onlyKana+'\n') #write all events in Kana
+                # lk.insert(0,eventTime+","+eventName[2:6]+","+onlyKana+'\n') #write all events in Kana
                 if(eventName[2]=='R'):
                     print(start, "report" ,onlyKana)
                     # lr.insert(0,eventTime+","+eventName[6:]+'\n')
+                    lk.insert(0,'r'+eventTime+","+onlyKana+'\n') #write all events in Kana
                     lr.insert(0,eventTime+","+onlyKana+'\n')
                 if(eventName[3]=='T'):
                     print(start, "test  " ,onlyKana)
                     # lt.insert(0,eventTime+","+eventName[6:]+'\n')
+                    lk.insert(0,'t'+eventTime+","+onlyKana+'\n') #write all events in Kana
                     lt.insert(0,eventTime+","+onlyKana+'\n')
                 if(eventName[4]=='G'):
                     print(start, "goods " ,onlyKana)
                     # lg.insert(0,eventTime+","+eventName[6:]+'\n')
+                    lk.insert(0,'g'+eventTime+","+onlyKana+'\n') #write all events in Kana
                     lg.insert(0,eventTime+","+onlyKana+'\n')
                 if(eventName[5]=='E'):
                     print(start, "event " ,onlyKana)
                     # le.insert(0,eventTime+","+eventName[6:]+'\n')
+                    lk.insert(0,'e'+eventTime+","+onlyKana+'\n') #write all events in Kana
                     le.insert(0,eventTime+","+onlyKana+'\n')
 
         fr.writelines(lr)
@@ -207,6 +212,9 @@ class googleCalendar:
                 l=f.readlines()
         elif(kind=='e'):
             with open((path+"event.txt")) as f:
+                l=f.readlines()
+        elif(kind=='a'):
+            with open((path+"kanaevent.txt")) as f:
                 l=f.readlines()
 
         else:
