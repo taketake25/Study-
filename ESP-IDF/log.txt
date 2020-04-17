@@ -1,0 +1,7 @@
+Toolchain path: /home/pi/esp/crosstool-NG/builds/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc
+Toolchain version: crosstool-ng-1.22.0-80-g6c4433a5
+Compiler version: 5.2.0
+Python requirements from /home/pi/esp/esp-idf/requirements.txt are satisfied.
+CC build/ESP32-ws2812-demo/ws2812.o
+/home/pi/esp/esp-idf/make/component_wrapper.mk:285: ターゲット 'ws2812.o' のレシピで失敗しました
+/home/pi/esp/esp-idf/make/project.mk:505: ターゲット 'component-ESP32-ws2812-demo-build' のレシピで失敗しました
